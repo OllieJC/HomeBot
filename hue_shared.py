@@ -39,8 +39,8 @@ def get_sensors():
     burl = base_url()
     if burl != 0:
         url = '{0}/sensors'.format(burl)
-        resp = requests.get(url).content
-        res_obj = resp.json()
+        resp = requests.get(url)
+        resp_json = resp.json()
         
         return_array = []
         
@@ -71,19 +71,17 @@ def bridge_status():
     load()
     if bridge_ip != "" and token != "":
         url = '{0}/config'.format(base_url())
-        resp = requests.get(url).content
-        res_obj = resp.json()
-        print(res_obj)
-        return jres
+        resp = requests.get(url)
+        resp_json = resp.json()
+        return str(resp_json)
 
 def request_token():
     load()
     if bridge_ip != "":
         url = 'http://{0}/api'.format(bridge_ip)
-        post_fields = {"devicetype":"homebot#smart_home_integration"}
+        post_fields = '{"devicetype":"homebot#smart_home_integration"}'
         resp = requests.post(url, data=post_fields)
         res_obj = resp.json()
-        print(res_obj)
         if len(res_obj) == 1:
             if 'success' in res_obj[0]:
                 token = res_obj[0]['success']['username']
