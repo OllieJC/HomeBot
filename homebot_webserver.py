@@ -7,6 +7,12 @@ from flask import Flask, request, send_from_directory, redirect, url_for
 # Flask
 app = Flask(__name__)
 
+def iporhostdefault():
+    res = homebot.ipaddress()
+    if not res:
+        res = "homebot.home"
+    return res
+
 @app.route("/slack_test", methods=["GET", "POST"])
 def slack_test():
     slack_shared.message("User token test.", 0)
@@ -25,7 +31,7 @@ def web_homepage():
     if "arm" in p_data:
         t = p_data['arm']
         homebot.set_arm_state(t)
-        return redirect(url_for('web_homepage'))
+        return redirect("/")
 
     state = homebot.arm_status()
     arm_disabled = "btn-primary"
@@ -95,7 +101,7 @@ def slack_pre_install():
         #print('https://slack.com/oauth/authorize?scope={0}&client_id={1}&redirect_uri={2}'.format(slack_oauth_scopes, slack_client_id, slack_redirect_uri))
     else:
         html += '<p>Client keys not set, please <a target="_blank" href="https://api.slack.com/slack-apps">create a new app</a> and enter the details below.<br/>'
-        html += 'Redirect URI should be entered in this format "http://homebot.domain:5000/auth_slack_finish" and all lower case when creating the app.</p>'
+        html += 'Redirect URI should be entered in this format "http://{0}:5000/auth_slack_finish" and all lower case when creating the app.</p>'.format( iporhostdefault() )
         html += '''
         <form action="/auth_slack" method="post">
             <div class="form-group">
@@ -112,11 +118,11 @@ def slack_pre_install():
             </div>
             <div class="form-group">
               <label for="slack-redirect-uri">Redirect URI:</label>
-              <input type="text" class="form-control" placeholder="http://homebot.domain:5000/auth_slack_finish" name="slack-redirect-uri">
+              <input type="text" class="form-control" placeholder="http://{0}:5000/auth_slack_finish" name="slack-redirect-uri">
             </div>
             <button type="submit" class="btn btn-default">Submit</button>
         </form>
-        '''
+        '''.format( iporhostdefault() )
     html += web_footer()
     return html
 
@@ -212,8 +218,6 @@ def web_header():
       <meta name="viewport" content="width=device-width, initial-scale=1">
       <link rel="stylesheet" href="css/bootstrap.min.css">
 
-      <link rel="stylesheet" href="css/main.css?v=1.0">
-
       <!--[if lt IE 9]>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js"></script>
       <![endif]-->
@@ -229,7 +233,6 @@ def web_header():
 def web_footer():
     html = '''
         </div> <!-- .container -->
-        <script src="js/main.js"></script>
         <script src="js/jquery.min.js"></script>
         <script src="js/bootstrap.min.js"></script>
     </body>

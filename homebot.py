@@ -15,7 +15,7 @@ def arm():
     return 1
 
 def disarm():
-    if status():
+    if arm_status():
         os.remove(armed_fname)
     return 1
 
@@ -24,6 +24,15 @@ def set_arm_state(inputvar):
         disarm()
     else:
         arm()
+
+def ipaddress():
+    import socket, re
+    hostname = socket.gethostname()
+    IPAddr = socket.gethostbyname(hostname)
+    textregex = re.search('(\d+\.\d+\.\d+\.\d+)', IPAddr, re.IGNORECASE)
+    if textregex:
+        return textregex.group(1)
+    return False
 
 modules_filenames = []
 def set_modules_filenames():
